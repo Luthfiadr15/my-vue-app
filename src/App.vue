@@ -1,53 +1,62 @@
 <script setup>
-import { ref } from 'vue';
+import { ref, computed, watch, onMounted } from 'vue';
 
-// 1. Variabel reaktif
-const message = ref('Halo, Vue!');
+const items = ref([
+  { id: 1, name: 'Vue.js' },
+  { id: 2, name: 'React' },
+  { id: 3, name: 'Angular' },
+]);
+
 const count = ref(0);
-const name = ref('');
-const isVisible = ref(true);
-const imageUrl = ref('/kucing.jpeg'); // Gambar dari folder 'public'
-const imagePreview = ref('');
+const doubleCount = computed(() => count.value * 5);
 
-// 2. Event handler
-const showAlert = () => alert('Tombol diklik!');
-const onFileChange = (event) => {
-  const file = event.target.files[0];
-  if (file) {
-    imagePreview.value = URL.createObjectURL(file);
+watch(count, (newValue, oldValue) => {
+  console.log(`Count berubah dari ${oldValue} ke ${newValue}`);
+});
+
+const messageRef = ref(null);
+
+onMounted(() => {
+  console.log('Komponen telah dimuat!');
+  if (messageRef.value) {
+    messageRef.value.style.color = 'blue';
   }
+});
+
+const increment = () => {
+  count.value++;
 };
 </script>
 
 <template>
   <div>
-    <!-- Text Interpolation -->
-    <h1>{{ message }}</h1>
+    <h1 ref="messageRef">Tutorial Vue JS</h1>
 
-    <!-- Variabel Reaktif (Counter) -->
-    <p>Nilai: {{ count }}</p>
-    <button @click="count++">Tambah</button>
+    <ul>
+      <li v-for="item in items" :key="item.id">
+        {{ item.name }}
+      </li>
+    </ul>
 
-    <!-- Form Binding -->
-    <input v-model="name" placeholder="Masukkan nama" />
-    <p>Nama Anda: {{ name }}</p>
-
-    <!-- Event Listener -->
-    <button @click="showAlert">Klik Saya</button>
-
-    <!-- Attribute Binding -->
-    <p>Gambar Kucing Lokal:</p>
-    <img :src="imageUrl" alt="Kucing" width="200" />
-
-    <!-- Upload Gambar -->
-    <input type="file" @change="onFileChange" accept="image/*" />
-    <div v-if="imagePreview">
-      <p>Gambar yang diunggah:</p>
-      <img :src="imagePreview" alt="Gambar unggahan" width="200" />
-    </div>
-
-    <!-- Conditional Rendering -->
-    <button @click="isVisible = !isVisible">Toggle Teks</button>
-    <p v-if="isVisible">Teks ini akan muncul atau hilang</p>
+    <p>Count: {{ count }}</p>
+    <p>Double Count: {{ doubleCount }}</p>
+    <button @click="increment">Tambah</button>
   </div>
 </template>
+
+<style scoped>
+h1 {
+  text-align: center;
+  margin-bottom: 20px;
+}
+button {
+  padding: 10px;
+  background-color: #42b883;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+button:hover {
+  background-color: #35495e;
+}
+</style>
