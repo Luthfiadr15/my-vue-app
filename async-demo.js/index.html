@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulasi Transaksi Bank</title>
+    <style>
+        /* Styling utama untuk body */
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: #e3f2fd;
+            text-align: center;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        /* Styling untuk container utama */
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0px 5px 15px rgba(0, 0, 0, 0.2);
+            width: 350px;
+            text-align: center;
+            transition: transform 0.3s ease-in-out;
+        }
+
+        /* Efek hover saat container disentuh */
+        .container:hover {
+            transform: scale(1.02);
+        }
+
+        /* Styling untuk saldo */
+        .saldo-container {
+            background: #007bff;
+            color: white;
+            padding: 10px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        /* Input field */
+        input {
+            width: 100%;
+            padding: 10px;
+            font-size: 16px;
+            border: 2px solid #ccc;
+            border-radius: 5px;
+            margin-bottom: 10px;
+            transition: 0.3s;
+        }
+
+        /* Efek saat input aktif */
+        input:focus {
+            border-color: #007bff;
+            outline: none;
+        }
+
+        /* Styling tombol */
+        button {
+            width: 100%;
+            padding: 12px;
+            font-size: 16px;
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: 0.3s;
+        }
+
+        /* Efek hover pada tombol */
+        button:hover {
+            background-color: #218838;
+            transform: scale(1.05);
+        }
+
+        /* Styling untuk status transfer */
+        .status {
+            margin-top: 15px;
+            font-weight: bold;
+            font-size: 16px;
+        }
+
+        /* Animasi loading */
+        .loading {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: white;
+            animation: spin 1s linear infinite;
+        }
+
+        /* Keyframes untuk animasi loading */
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h2>Simulasi Transaksi Bank</h2>
+        <div class="saldo-container">Saldo: <span id="saldo"></span></div>
+        <input type="number" id="jumlah" placeholder="Masukkan jumlah transfer">
+        <button id="transferBtn">Transfer</button>
+        <p class="status"></p>
+    </div>
+
+    <script>
+        let saldo = 1000000000; // Saldo awal 
+
+        // Fungsi untuk memformat angka menjadi format Rupiah
+        function formatRupiah(number) {
+            return new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR" }).format(number);
+        }
+
+        // Menampilkan saldo awal di halaman
+        document.getElementById("saldo").innerText = formatRupiah(saldo);
+
+        // Event listener saat tombol transfer diklik
+        document.getElementById("transferBtn").addEventListener("click", async function () {
+            let jumlah = parseInt(document.getElementById("jumlah").value); // Mengambil nilai input
+            let statusElement = document.querySelector(".status"); // Mengambil elemen status
+
+            // Validasi input
+            if (isNaN(jumlah) || jumlah <= 0) {
+                statusElement.innerHTML = "Masukkan jumlah transfer yang valid!";
+                statusElement.style.color = "red";
+                return;
+            }
+
+            try {
+                // Menampilkan pesan loading
+                statusElement.innerHTML = `<div class="loading"></div> Sedang memproses transfer...`;
+                statusElement.style.color = "black";
+
+                // Memanggil fungsi transfer dengan async/await
+                await transferBank(jumlah);
+                saldo -= jumlah; // Mengurangi saldo setelah transfer berhasil
+                document.getElementById("saldo").innerText = formatRupiah(saldo);
+
+                // Menampilkan pesan sukses
+                statusElement.innerHTML = `✅ Transfer ${formatRupiah(jumlah)} berhasil!`;
+                statusElement.style.color = "green";
+            } catch (error) {
+                // Menampilkan pesan error jika saldo tidak cukup
+                statusElement.innerHTML = `❌ ${error}`;
+                statusElement.style.color = "red";
+            }
+        });
+
+        // Fungsi untuk mensimulasikan transfer bank dengan Promise
+        function transferBank(jumlah) {
+            return new Promise((resolve, reject) => {
+                setTimeout(() => {
+                    if (jumlah > saldo) {
+                        reject("Saldo tidak cukup!");
+                    } else {
+                        resolve();
+                    }
+                }, 2000); // Simulasi delay selama 2 detik
+            });
+        }
+    </script>
+
+</body>
+</html>
